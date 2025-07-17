@@ -1,0 +1,248 @@
+openapi: 3.0.3
+info:
+  title: Pokémon Repository API
+  version: 1.0.0
+  description: |
+    This API allows clients to perform CRUD (Create, Read, Update, Delete) operations on a repository of Pokémon. Each Pokémon has a unique set of attributes, including types, abilities, and other metadata. The API is designed to be RESTful and returns detailed error messages for invalid requests.
+servers:
+  - url: http://localhost:3000/api
+    description: Local development server
+
+paths:
+  /pokemon:
+    get:
+      summary: List all Pokémon
+      description: Retrieve a paginated list of all Pokémon in the repository.
+      parameters:
+        - in: query
+          name: limit
+          schema:
+            type: integer
+            default: 20
+            minimum: 1
+            maximum: 100
+          description: Maximum number of Pokémon to return.
+        - in: query
+          name: offset
+          schema:
+            type: integer
+            default: 0
+            minimum: 0
+          description: Number of Pokémon to skip before starting to collect the result set.
+      responses:
+        '200':
+          description: A list of Pokémon.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  total:
+                    type: integer
+                    description: Total number of Pokémon in the repository.
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Pokemon'
+    post:
+      summary: Create a new Pokémon
+      description: Add a new Pokémon to the repository.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PokemonCreateRequest'
+      responses:
+        '201':
+          description: Pokémon created successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Pokemon'
+        '400':
+          description: Invalid input data.
+
+  /pokemon/{id}:
+    get:
+      summary: Get a Pokémon by ID
+      description: Retrieve a single Pokémon by its unique identifier.
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+          description: Unique identifier of the Pokémon.
+      responses:
+        '200':
+          description: Pokémon found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Pokemon'
+        '404':
+          description: Pokémon not found.
+    put:
+      summary: Update a Pokémon by ID
+      description: Update the details of an existing Pokémon.
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+          description: Unique identifier of the Pokémon.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PokemonUpdateRequest'
+      responses:
+        '200':
+          description: Pokémon updated successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Pokemon'
+        '400':
+          description: Invalid input data.
+        '404':
+          description: Pokémon not found.
+    delete:
+      summary: Delete a Pokémon by ID
+      description: Remove a Pokémon from the repository by its unique identifier.
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+          description: Unique identifier of the Pokémon.
+      responses:
+        '204':
+          description: Pokémon deleted successfully. No content returned.
+        '404':
+          description: Pokémon not found.
+
+components:
+  schemas:
+    Pokemon:
+      type: object
+      required:
+        - id
+        - name
+        - type
+        - level
+        - abilities
+        - isLegendary
+        - createdAt
+        - updatedAt
+      properties:
+        id:
+          type: integer
+          description: Unique identifier for the Pokémon.
+          example: 25
+        name:
+          type: string
+          description: The name of the Pokémon.
+          example: Pikachu
+        type:
+          type: array
+          items:
+            type: string
+            description: Pokémon type (e.g., Fire, Water, Grass, Electric, etc.)
+          description: List of Pokémon types. A Pokémon can have one or more types.
+          example: ["Electric"]
+        level:
+          type: integer
+          description: The current level of the Pokémon (1-100).
+          minimum: 1
+          maximum: 100
+          example: 35
+        abilities:
+          type: array
+          items:
+            type: string
+            description: Name of an ability.
+          description: List of abilities the Pokémon possesses.
+          example: ["Static", "Lightning Rod"]
+        isLegendary:
+          type: boolean
+          description: Indicates if the Pokémon is considered legendary.
+          example: false
+        createdAt:
+          type: string
+          format: date-time
+          description: Timestamp when the Pokémon was created in the repository.
+          example: '2024-06-01T12:00:00Z'
+        updatedAt:
+          type: string
+          format: date-time
+          description: Timestamp when the Pokémon was last updated.
+          example: '2024-06-01T12:00:00Z'
+    PokemonCreateRequest:
+      type: object
+      required:
+        - name
+        - type
+        - level
+        - abilities
+        - isLegendary
+      properties:
+        name:
+          type: string
+          description: The name of the Pokémon.
+        type:
+          type: array
+          items:
+            type: string
+            description: Pokémon type (e.g., Fire, Water, Grass, Electric, etc.)
+          description: List of Pokémon types. A Pokémon can have one or more types.
+        level:
+          type: integer
+          description: The current level of the Pokémon (1-100).
+          minimum: 1
+          maximum: 100
+        abilities:
+          type: array
+          items:
+            type: string
+            description: Name of an ability.
+          description: List of abilities the Pokémon possesses.
+        isLegendary:
+          type: boolean
+          description: Indicates if the Pokémon is considered legendary.
+    PokemonUpdateRequest:
+      type: object
+      required:
+        - name
+        - type
+        - level
+        - abilities
+        - isLegendary
+      properties:
+        name:
+          type: string
+          description: The name of the Pokémon.
+        type:
+          type: array
+          items:
+            type: string
+            description: Pokémon type (e.g., Fire, Water, Grass, Electric, etc.)
+          description: List of Pokémon types. A Pokémon can have one or more types.
+        level:
+          type: integer
+          description: The current level of the Pokémon (1-100).
+          minimum: 1
+          maximum: 100
+        abilities:
+          type: array
+          items:
+            type: string
+            description: Name of an ability.
+          description: List of abilities the Pokémon possesses.
+        isLegendary:
+          type: boolean
+          description: Indicates if the Pokémon is considered legendary. 
