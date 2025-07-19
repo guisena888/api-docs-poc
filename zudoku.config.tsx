@@ -4,7 +4,7 @@ const config: ZudokuConfig = {
   basePath: "/api-docs-poc",
   site: {
     logo: {
-      src: { light: "/logo-light.svg", dark: "/logo-dark.svg" },
+      src: { light: "logo-light.svg", dark: "logo-dark.svg" },
       alt: "Zudoku",
       width: "130px",
     },
